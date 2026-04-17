@@ -3,17 +3,34 @@ import { AppModule } from './app.module';
 import { initFirebase } from './firebase/firebase.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  try {
+    console.log("🚀 Starting app...");
 
-  // inicializar Firebase UNA sola vez
-  initFirebase();
+    const app = await NestFactory.create(AppModule);
+    console.log("✅ Nest app created");
 
-  app.enableCors({
-    origin: true,
-    credentials: true,
-  });
+    // inicializar Firebase
+    console.log("🔥 Initializing Firebase...");
+    initFirebase();
+    console.log("✅ Firebase initialized");
 
-  const port = process.env.PORT || 3002;
-  await app.listen(port);
+    app.enableCors({
+      origin: true,
+      credentials: true,
+    });
+    console.log("✅ CORS enabled");
+
+    const port = process.env.PORT || 3002;
+    console.log(`🌐 Using port: ${port}`);
+
+    await app.listen(port);
+
+    console.log(`🔥 Server running on port ${port}`);
+  } catch (error) {
+    console.error("❌ ERROR DURING STARTUP:");
+    console.error(error);
+    process.exit(1);
+  }
 }
+
 bootstrap();
