@@ -8,9 +8,9 @@ export class AppController {
   @Post('chat')
   async chat(@Body('message') message: string, @Req() req: any) {
 
-    console.log(" Mensaje recibido:", message);
+    console.log("Mensaje recibido:", message);
 
-    //  Validación mensaje
+    // Validación mensaje
     if (!message || typeof message !== 'string' || message.trim() === '') {
       throw new BadRequestException('Mensaje inválido');
     }
@@ -25,21 +25,35 @@ export class AppController {
     try {
       // Validar usuario Firebase
       const decoded = await admin.auth().verifyIdToken(token);
-
-      console.log(" USER:", decoded.email);
-
+      console.log("USER:", decoded.email);
     } catch (error) {
-      console.error(" Token inválido");
+      console.error("Token inválido");
       return { reply: 'Token inválido' };
     }
 
     try {
-      console.log(" Enviando a OpenAI...");
-
+      console.log("Enviando a OpenRouter...");
+// 🔁 IMPLEMENTACIÓN ANTERIOR (OpenAI)
+// const response = await axios.post(
+//   'https://api.openai.com/v1/chat/completions',
+//   {
+//     model: 'gpt-4o-mini',
+//     messages: [
+//       { role: 'system', content: 'You are a helpful assistant.' },
+//       { role: 'user', content: message },
+//     ],
+//   },
+//   {
+//     headers: {
+//       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+//       'Content-Type': 'application/json',
+//     },
+//   },
+// );
       const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
+        'https://openrouter.ai/api/v1/chat/completions',
         {
-          model: 'gpt-4o-mini',
+          model: 'mistralai/mistral-7b-instruct', 
           messages: [
             {
               role: 'system',
@@ -53,25 +67,27 @@ export class AppController {
         },
         {
           headers: {
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
             'Content-Type': 'application/json',
+            'HTTP-Referer': 'http://localhost:3000',
+            'X-Title': 'Chat App',
           },
         },
       );
 
-      console.log(" Respuesta OpenAI OK");
+      console.log("Respuesta OpenRouter OK");
 
       return {
         reply: response.data.choices?.[0]?.message?.content || 'Sin respuesta',
       };
 
     } catch (error: any) {
-      console.error(" ERROR IA:", error?.response?.data || error.message);
+      console.error("ERROR IA:", error?.response?.data || error.message);
 
-      //  fallback para demo (por si no tengo créditos)
-     return {
-      reply: "Hola! 👋 Estoy en modo demo por el momento, pero puedo ayudarte igual. ¿En qué puedo asistirte?"
-};
+      // fallback limpio para demo
+      return {
+        reply: "Hola! 👋 Estoy en modo demo por el momento, pero puedo ayudarte igual. ¿En qué puedo asistirte?"
+      };
     }
   }
 }
