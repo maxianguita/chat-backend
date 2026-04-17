@@ -69,9 +69,9 @@ export class AppController {
       console.error(" ERROR IA:", error?.response?.data || error.message);
 
       //  fallback para demo (por si no tengo créditos)
-      return {
-        reply: `Simulación: ${message}`,
-      };
+     return {
+      reply: "Hola! 👋 Estoy en modo demo por el momento, pero puedo ayudarte igual. ¿En qué puedo asistirte?"
+};
     }
   }
 }
