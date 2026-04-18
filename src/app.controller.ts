@@ -7,7 +7,8 @@ export class AppController {
 
   @Post('chat')
   async chat(@Body('message') message: string, @Req() req: any) {
-
+  console.log("ENTRO A CHAT");
+  console.log("KEY BACK:", process.env.OPENROUTER_API_KEY);
     console.log("Mensaje recibido:", message);
 
     // Validación mensaje
@@ -18,14 +19,14 @@ export class AppController {
     // Obtener token
     const token = req.headers.authorization?.split(' ')[1];
 
-    if (!token) {
-      return { reply: 'No autorizado' };
-    }
+     if (!token) {
+       return { reply: 'No autorizado' };
+     }
 
     try {
       // Validar usuario Firebase
-      const decoded = await admin.auth().verifyIdToken(token);
-      console.log("USER:", decoded.email);
+       const decoded = await admin.auth().verifyIdToken(token);
+      // console.log("USER:", decoded.email);
     } catch (error) {
       console.error("Token inválido");
       return { reply: 'Token inválido' };
@@ -50,10 +51,11 @@ export class AppController {
 //     },
 //   },
 // );
+
       const response = await axios.post(
         'https://openrouter.ai/api/v1/chat/completions',
         {
-          model: 'mistralai/mistral-7b-instruct', 
+         model: 'openai/gpt-4o-mini',
           messages: [
             {
               role: 'system',
@@ -82,12 +84,14 @@ export class AppController {
       };
 
     } catch (error: any) {
-      console.error("ERROR IA:", error?.response?.data || error.message);
+  console.error("❌ ERROR IA COMPLETO:", error);
+  console.error("❌ ERROR IA RESPONSE:", error?.response?.data);
+  console.error("❌ ERROR IA STATUS:", error?.response?.status);
 
-      // fallback limpio para demo
-      return {
-        reply: "Hola! 👋 Estoy en modo demo por el momento, pero puedo ayudarte igual. ¿En qué puedo asistirte?"
-      };
-    }
+  return {
+    reply: "Error real en consola "
+ 
+  };
+}
   }
 }
